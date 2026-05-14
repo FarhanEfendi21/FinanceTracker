@@ -1,149 +1,296 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Card } from '@/components/ui/card'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
-import { TrendingUp, TrendingDown, Wallet } from 'lucide-react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { Wallet, ArrowUpRight, ArrowDownRight, TrendingDown } from 'lucide-react'
 
 export default function DashboardStats({ transactions }: { transactions: any[] }) {
   const stats = useMemo(() => {
-    const income = transactions
-      .filter((t) => t.type === 'income')
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+
+    // This month's transactions
+    const thisMonthTx = transactions.filter(t => {
+      const d = new Date(t.date)
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+    })
+
+    // Last month's transactions
+    const lastMonthTx = transactions.filter(t => {
+      const d = new Date(t.date)
+      return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear
+    })
+
+    const income = thisMonthTx
+      .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0)
 
-    const expenses = transactions
-      .filter((t) => t.type === 'expense')
+    const expenses = thisMonthTx
+      .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0)
 
-    const balance = income - expenses
+    const lastMonthIncome = lastMonthTx
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0)
 
-    // Category breakdown for expenses
-    const expensesByCategory = transactions
-      .filter((t) => t.type === 'expense')
-      .reduce(
-        (acc, t) => {
-          const existing = acc.find((item) => item.name === t.category)
-          if (existing) {
-            existing.value += parseFloat(t.amount)
-          } else {
-            acc.push({ name: t.category, value: parseFloat(t.amount) })
-          }
-          return acc
-        },
-        [] as { name: string; value: number }[]
-      )
+    const lastMonthExpenses = lastMonthTx
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0)
 
-    // Monthly trend
-    const monthlyData: { [key: string]: { income: number; expenses: number } } = {}
-    transactions.forEach((t) => {
-      const month = new Date(t.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-      if (!monthlyData[month]) {
-        monthlyData[month] = { income: 0, expenses: 0 }
-      }
-      const amount = parseFloat(t.amount)
-      if (t.type === 'income') {
-        monthlyData[month].income += amount
-      } else {
-        monthlyData[month].expenses += amount
+    // All-time balance
+    const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0)
+    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0)
+    const balance = totalIncome - totalExpenses
+
+    // % change vs last month
+    const incomeChange = lastMonthIncome > 0 ? ((income - lastMonthIncome) / lastMonthIncome) * 100 : null
+    const expensesChange = lastMonthExpenses > 0 ? ((expenses - lastMonthExpenses) / lastMonthExpenses) * 100 : null
+
+    // Category breakdown for this month's expenses
+    const expensesByCategory = thisMonthTx
+      .filter(t => t.type === 'expense')
+      .reduce((acc, t) => {
+        const existing = acc.find((item: any) => item.name === t.category)
+        if (existing) {
+          existing.value += parseFloat(t.amount)
+        } else {
+          acc.push({ name: t.category, value: parseFloat(t.amount) })
+        }
+        return acc
+      }, [] as { name: string; value: number }[])
+
+    // Monthly trend (last 6 months)
+    const monthlyData: { [key: string]: { income: number; expenses: number; sortKey: number } } = {}
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(currentYear, currentMonth - i, 1)
+      const key = d.toLocaleDateString('en-US', { month: 'short' })
+      monthlyData[key] = { income: 0, expenses: 0, sortKey: d.getTime() }
+    }
+
+    transactions.forEach(t => {
+      const d = new Date(t.date)
+      const key = d.toLocaleDateString('en-US', { month: 'short' })
+      // Only include last 6 months
+      const monthsAgo = (currentYear - d.getFullYear()) * 12 + (currentMonth - d.getMonth())
+      if (monthsAgo >= 0 && monthsAgo <= 5) {
+        if (!monthlyData[key]) {
+          monthlyData[key] = { income: 0, expenses: 0, sortKey: d.getTime() }
+        }
+        const amount = parseFloat(t.amount)
+        if (t.type === 'income') {
+          monthlyData[key].income += amount
+        } else {
+          monthlyData[key].expenses += amount
+        }
       }
     })
 
     const monthlyTrend = Object.entries(monthlyData)
-      .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
-      .slice(-6)
-      .map(([month, data]) => ({
-        month,
-        income: data.income,
-        expenses: data.expenses,
-      }))
+      .sort((a, b) => a[1].sortKey - b[1].sortKey)
+      .map(([month, data]) => ({ month, income: data.income, expenses: data.expenses }))
 
-    return { income, expenses, balance, expensesByCategory, monthlyTrend }
+    return { income, expenses, balance, incomeChange, expensesChange, expensesByCategory, monthlyTrend }
   }, [transactions])
 
-  const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#10b981', '#06b6d4', '#0ea5e9']
+  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e']
+
+  const formatChange = (change: number | null) => {
+    if (change === null) return null
+    const sign = change >= 0 ? '+' : ''
+    return `${sign}${change.toFixed(1)}% vs last month`
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Balance</p>
-              <p className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${Math.abs(stats.balance).toFixed(2)}
-              </p>
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Balance Card */}
+        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+          <div className="relative z-10">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/20 dark:shadow-white/5">
+              <Wallet className="h-6 w-6" />
             </div>
-            <Wallet className="h-8 w-8 text-blue-600" />
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">Total Balance</p>
+            <div className="mt-1">
+              <h2 className={`text-3xl font-bold tracking-tight ${stats.balance >= 0 ? 'text-black dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
+                IDR {Math.abs(stats.balance).toLocaleString('id-ID')}
+              </h2>
+              {stats.balance < 0 && (
+                <p className="mt-1 text-[10px] font-bold text-rose-500">Deficit — spending exceeds income</p>
+              )}
+            </div>
           </div>
-        </Card>
+          <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-black/[0.02] dark:bg-white/[0.02] transition-transform group-hover:scale-150" />
+        </div>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Income</p>
-              <p className="text-2xl font-bold text-green-600">${stats.income.toFixed(2)}</p>
+        {/* Income Card */}
+        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+          <div className="relative z-10">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">
+              <ArrowUpRight className="h-6 w-6" />
             </div>
-            <TrendingUp className="h-8 w-8 text-green-600" />
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">This Month's Income</p>
+            <div className="mt-1">
+              <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white">
+                IDR {stats.income.toLocaleString('id-ID')}
+              </h2>
+              {stats.incomeChange !== null && (
+                <p className={`mt-1 text-[10px] font-bold ${stats.incomeChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+                  {formatChange(stats.incomeChange)}
+                </p>
+              )}
+            </div>
           </div>
-        </Card>
+          <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-emerald-500/[0.03] transition-transform group-hover:scale-150" />
+        </div>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Expenses</p>
-              <p className="text-2xl font-bold text-red-600">${stats.expenses.toFixed(2)}</p>
+        {/* Expenses Card */}
+        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+          <div className="relative z-10">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400">
+              <ArrowDownRight className="h-6 w-6" />
             </div>
-            <TrendingDown className="h-8 w-8 text-red-600" />
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">This Month's Expenses</p>
+            <div className="mt-1">
+              <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white">
+                IDR {stats.expenses.toLocaleString('id-ID')}
+              </h2>
+              {stats.expensesChange !== null && (
+                <p className={`mt-1 text-[10px] font-bold ${stats.expensesChange <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+                  {formatChange(stats.expensesChange)}
+                </p>
+              )}
+            </div>
           </div>
-        </Card>
+          <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-rose-500/[0.03] transition-transform group-hover:scale-150" />
+        </div>
       </div>
 
       {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Monthly Trend Chart */}
-        {stats.monthlyTrend.length > 0 && (
-          <Card className="p-6">
-            <h3 className="mb-4 font-semibold text-foreground">Monthly Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats.monthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="month" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb' }} />
-                <Legend />
-                <Bar dataKey="income" fill="#10b981" />
-                <Bar dataKey="expenses" fill="#ef4444" />
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Monthly Trend */}
+        <div className="rounded-[2.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8">
+          <div className="mb-8 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-black dark:text-white">6-Month Overview</h3>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium text-muted-foreground">Income</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-rose-500" />
+                <span className="text-xs font-medium text-muted-foreground">Expenses</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.monthlyTrend} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
+                <CartesianGrid vertical={false} horizontal={false} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} tickFormatter={(v) => v === 0 ? '' : `${(v/1000).toFixed(0)}k`} />
+                <Tooltip 
+                  cursor={{ fill: '#00000005' }}
+                  formatter={(value: any, name: string) => [`IDR ${value.toLocaleString('id-ID')}`, name.charAt(0).toUpperCase() + name.slice(1)]}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                  itemStyle={{ color: 'var(--foreground)' }}
+                />
+                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>
-          </Card>
-        )}
+          </div>
+        </div>
 
-        {/* Expenses by Category */}
-        {stats.expensesByCategory.length > 0 && (
-          <Card className="p-6">
-            <h3 className="mb-4 font-semibold text-foreground">Expenses by Category</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.expensesByCategory}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: $${value.toFixed(0)}`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stats.expensesByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </Card>
-        )}
+        {/* Categories Pie */}
+        <div className="rounded-[2.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8">
+          <div className="mb-8 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-black dark:text-white">Category Breakdown</h3>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">This Month</span>
+          </div>
+          
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr),minmax(0,1.2fr)] items-center">
+            <div className="relative h-[280px] w-full flex items-center justify-center">
+              {stats.expensesByCategory.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie 
+                        data={stats.expensesByCategory} 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={85} 
+                        outerRadius={110} 
+                        paddingAngle={4} 
+                        dataKey="value" 
+                        stroke="none"
+                        animationBegin={0}
+                        animationDuration={1500}
+                      >
+                        {stats.expensesByCategory.map((_: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: any, name: string) => [`IDR ${value.toLocaleString('id-ID')}`, name]}
+                        contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                        itemStyle={{ color: 'var(--foreground)' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Centered Total */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Total</p>
+                    <p className="text-2xl font-bold text-black dark:text-white">
+                      IDR {stats.expenses.toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center space-y-2 text-center">
+                  <div className="rounded-full bg-black/5 dark:bg-white/5 p-4 text-muted-foreground">
+                    <TrendingDown className="h-8 w-8" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">No expenses this month</p>
+                </div>
+              )}
+            </div>
+
+            {/* List Legend */}
+            <div className="space-y-5">
+              {stats.expensesByCategory.length > 0 ? (
+                stats.expensesByCategory.slice(0, 5).map((cat: any, i: number) => (
+                  <div key={cat.name} className="flex items-center justify-between group cursor-default">
+                    <div className="flex items-center gap-4">
+                      <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-black dark:text-white uppercase tracking-tight group-hover:text-emerald-500 transition-colors">{cat.name}</span>
+                        <span className="text-[10px] font-medium text-muted-foreground">
+                          {((cat.value / stats.expenses) * 100).toFixed(0)}% of total
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-black dark:text-white group-hover:translate-x-[-4px] transition-transform">
+                      IDR {cat.value.toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-[10px] text-center text-muted-foreground italic">Add transactions to see breakdown</p>
+              )}
+              {stats.expensesByCategory.length > 5 && (
+                <div className="pt-4 flex justify-center border-t border-black/5 dark:border-white/5">
+                  <p className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                    + {stats.expensesByCategory.length - 5} more categories
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
