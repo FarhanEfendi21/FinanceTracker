@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Wallet, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function Page({
   searchParams,
@@ -8,29 +9,48 @@ export default async function Page({
   const params = await searchParams
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                Sorry, something went wrong.
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {params?.error ? (
-                <p className="text-sm text-muted-foreground">
-                  Code error: {params.error}
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  An unspecified error occurred.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F9F9F9] p-6 md:p-10">
+      <div className="w-full max-w-[400px] space-y-8">
+        <div className="flex flex-col items-center space-y-2 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-white shadow-lg">
+            <Wallet className="h-6 w-6" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-black">FlowLedger</h1>
         </div>
+
+        <div className="rounded-3xl border border-black/5 bg-white p-8 shadow-sm text-center">
+          <div className="mb-6 flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600">
+              <AlertCircle className="h-8 w-8" />
+            </div>
+          </div>
+          
+          <h2 className="mb-2 text-2xl font-bold text-black">Something went wrong</h2>
+          <div className="mb-8 rounded-xl bg-red-50/50 p-4 border border-red-100/50">
+            {params?.error ? (
+              <p className="text-sm font-medium text-red-900">
+                Error: {params.error}
+              </p>
+            ) : (
+              <p className="text-sm font-medium text-red-900">
+                An unspecified error occurred.
+              </p>
+            )}
+          </div>
+
+          <Link 
+            href="/auth/login" 
+            className="flex h-12 w-full items-center justify-center rounded-xl bg-black font-semibold text-white hover:bg-black/90 transition-colors"
+          >
+            Try Again
+          </Link>
+        </div>
+        
+        <p className="text-center text-xs text-muted-foreground">
+          &copy; {new Date().getFullYear()} FlowLedger. All rights reserved.
+        </p>
       </div>
     </div>
   )
 }
+
