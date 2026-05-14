@@ -2,8 +2,21 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { LogOut } from 'lucide-react'
+import { LogOut, Wallet, User, Settings } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+
+import { ThemeToggle } from '@/components/theme-toggle'
+import BoringAvatar from 'boring-avatars'
 
 export default function DashboardHeader({ user }: { user?: any }) {
   const router = useRouter()
@@ -15,21 +28,63 @@ export default function DashboardHeader({ user }: { user?: any }) {
   }
 
   return (
-    <header className="border-b border-border bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">FlowLedger</h1>
-          <p className="text-sm text-muted-foreground">Personal Finance Manager</p>
+    <header className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-md transition-colors duration-500">
+      <div className="flex items-center justify-between px-4 py-4 md:px-8">
+        <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black dark:bg-white text-white dark:text-black shadow-md">
+            <Wallet className="h-5 w-5" />
+          </div>
+          <h1 className="text-lg font-bold tracking-tight text-black dark:text-white">FlowLedger</h1>
         </div>
 
-        <div className="flex items-center gap-4">
-          {user && <p className="text-sm text-muted-foreground">{user.email}</p>}
-          <Button onClick={handleLogout} variant="outline" size="sm" className="gap-2">
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
+        <div className="ml-auto flex items-center gap-4">
+          <ThemeToggle />
+          {user && (
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 hover:bg-black/5 dark:hover:bg-white/5 ring-offset-background transition-all active:scale-95">
+                    <div className="h-10 w-10 overflow-hidden rounded-full border border-black/5 dark:border-white/5">
+                      <BoringAvatar
+                        size={40}
+                        name={user.email || 'user'}
+                        variant="beam"
+                        colors={['#FFAD08', '#EDD75A', '#73B06F', '#0C8F8F', '#405059']}
+                      />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 rounded-2xl p-2 dark:bg-[#1f1f1f] dark:border-white/5" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none text-black dark:text-white">My Account</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-black/5 dark:bg-white/5" />
+                  <DropdownMenuItem asChild className="rounded-xl focus:bg-black/5 dark:focus:bg-white/5 cursor-pointer">
+                    <Link href="/dashboard/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-black/5 dark:bg-white/5" />
+                  <DropdownMenuItem 
+                    className="rounded-xl text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-400 cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
       </div>
     </header>
   )
 }
+
