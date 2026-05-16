@@ -1,0 +1,82 @@
+/* components/animations/LogoLoop/LogoLoop.css */
+
+.logo-loop-container {
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Elegant fade masking effect for seamless edges */
+.logo-loop-fade {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 15%,
+    black 85%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 15%,
+    black 85%,
+    transparent
+  );
+}
+
+.logo-loop-track {
+  display: flex;
+  gap: var(--loop-gap);
+  width: max-content;
+  align-items: center;
+  /* Use translate3d for GPU optimization */
+  animation: logo-scroll var(--loop-speed) linear infinite var(--loop-direction);
+  transition: animation-duration 0.5s ease-out; /* Smooth deceleration on hover */
+  will-change: transform;
+}
+
+.logo-group {
+  display: flex;
+  gap: var(--loop-gap);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--logo-height);
+  color: var(--muted-foreground, #888); /* Clean monochrome aesthetic */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: var(--logo-height); /* Scale icon to height */
+  cursor: default;
+}
+
+.logo-hover-scale:hover {
+  transform: scale(1.15);
+  color: var(--foreground, #111);
+}
+
+.dark .logo-hover-scale:hover {
+  color: #fff;
+}
+
+@keyframes logo-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    /* Translate by width of one logo-group plus one gap. 
+       Since there are 3 groups and 2 gaps in the track, the math translates exactly 1 group distance */
+    transform: translate3d(calc(-33.33333% - calc(var(--loop-gap) / 3)), 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-loop-track {
+    animation-duration: 200s; /* Slower for accessibility */
+  }
+}
