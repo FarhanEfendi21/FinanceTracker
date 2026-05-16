@@ -8,6 +8,22 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Wallet, ArrowRight, Loader2 } from 'lucide-react'
+import {
+  SiReact,
+  SiNextdotjs,
+  SiTypescript,
+  SiTailwindcss,
+  SiSupabase,
+} from "react-icons/si";
+import LogoLoop from '@/components/animations/LogoLoop/LogoLoop'
+
+const techLogos = [
+  { node: <SiReact />, title: "React" },
+  { node: <SiNextdotjs />, title: "Next.js" },
+  { node: <SiTypescript />, title: "TypeScript" },
+  { node: <SiTailwindcss />, title: "Tailwind CSS" },
+  { node: <SiSupabase />, title: "Supabase" },
+];
 
 export default function Page() {
   const [email, setEmail] = useState('')
@@ -124,6 +140,23 @@ export default function Page() {
           </div>
         </div>
         
+        <div className="w-full overflow-hidden pt-4 pb-2">
+          <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-6">
+            Powered by Modern Tech Stack
+          </p>
+          <LogoLoop
+            logos={techLogos}
+            speed={40}
+            direction="left"
+            logoHeight={24}
+            gap={40}
+            hoverSpeed={100}
+            fadeOut={true}
+            scaleOnHover={true}
+            ariaLabel="Technology stack showcase"
+          />
+        </div>
+
         <p className="text-center text-xs text-muted-foreground">
           &copy; {new Date().getFullYear()} FlowLedger. All rights reserved.
         </p>
