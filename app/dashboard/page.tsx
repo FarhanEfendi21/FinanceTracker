@@ -7,6 +7,7 @@ import DashboardHeader from '@/components/dashboard-header'
 import TransactionForm from '@/components/transaction-form'
 import TransactionList from '@/components/transaction-list'
 import DashboardStats from '@/components/dashboard-stats'
+import { TextType } from '@/components/animations/TextType/TextType'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -66,8 +67,16 @@ export default function Dashboard() {
         {/* Page Header */}
         <div className="mb-10 flex items-end justify-between">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white">
-              Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : user?.email ? `, ${user.email.split('@')[0]}` : ''}
+            <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white mb-2">
+              <TextType
+                text={[`Welcome back${user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : user?.email ? `, ${user.email.split('@')[0]}` : ''}`]}
+                typingSpeed={75}
+                showCursor={true}
+                cursorCharacter="|"
+                startOnVisible={true}
+                loop={false}
+                variableSpeed={{ min: 40, max: 90 }}
+              />
             </h2>
             <p className="text-sm font-medium text-muted-foreground">
               Here's what's happening with your finances today.

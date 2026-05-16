@@ -186,20 +186,46 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Large Area Chart */}
-          <div className="rounded-[2.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-10">
-            <div className="mb-10 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-black dark:text-white">Income vs Expenses</h3>
-                <p className="text-xs font-medium text-muted-foreground">Monthly cash flow — last {periodLabel}</p>
+          <div className="rounded-[2.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 md:p-10">
+            <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-black dark:text-white">Cash Flow Performance</h3>
+                <p className="text-xs font-medium text-muted-foreground">Comparative analysis of your income and expenses — last {periodLabel}</p>
               </div>
-              <div className="flex gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-emerald-500" />
-                  <span className="text-xs font-bold text-black dark:text-white">Income</span>
+              
+              <div className="flex flex-wrap items-center gap-3 md:gap-6">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Income</span>
+                  </div>
+                  <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                    IDR {stats.totalIncome.toLocaleString('id-ID')}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-rose-500" />
-                  <span className="text-xs font-bold text-black dark:text-white">Expenses</span>
+
+                <div className="h-8 w-px bg-black/5 dark:bg-white/5 hidden md:block" />
+
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-rose-500" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Expenses</span>
+                  </div>
+                  <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                    IDR {stats.totalExpenses.toLocaleString('id-ID')}
+                  </p>
+                </div>
+
+                <div className="h-8 w-px bg-black/5 dark:bg-white/5 hidden md:block" />
+
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-black dark:bg-white opacity-20" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Net Savings</span>
+                  </div>
+                  <p className={`text-sm font-bold ${(stats.totalIncome - stats.totalExpenses) >= 0 ? 'text-black dark:text-white' : 'text-rose-500'}`}>
+                    IDR {(stats.totalIncome - stats.totalExpenses).toLocaleString('id-ID')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -207,27 +233,83 @@ export default function AnalyticsPage() {
             <div className="h-[400px] w-full">
               {stats.trendData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={stats.trendData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <AreaChart data={stats.trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.08}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.01}/>
                       </linearGradient>
                       <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.08}/>
-                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.15}/>
+                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.01}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid vertical={false} horizontal={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} tickFormatter={(v) => v === 0 ? '' : `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip 
-                      formatter={(value: any, name: string) => [`IDR ${value.toLocaleString('id-ID')}`, name.charAt(0).toUpperCase() + name.slice(1)]}
-                      contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', color: 'var(--foreground)' }}
-                      itemStyle={{ color: 'var(--foreground)' }}
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="currentColor" className="text-black/[0.03] dark:text-white/[0.03]" />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 600 }} 
+                      dy={15} 
                     />
-                    <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
-                    <Area type="monotone" dataKey="expenses" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorExpenses)" />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 600 }} 
+                      tickFormatter={(v) => v === 0 ? '' : `${(v/1000).toFixed(0)}k`} 
+                      dx={-10}
+                    />
+                    <Tooltip 
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white/80 dark:bg-card/80 p-4 shadow-2xl backdrop-blur-md">
+                              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+                              <div className="space-y-1.5">
+                                {payload.map((entry: any, i: number) => (
+                                  <div key={i} className="flex items-center justify-between gap-8">
+                                    <div className="flex items-center gap-2">
+                                      <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                                      <span className="text-xs font-medium text-muted-foreground">{entry.name}</span>
+                                    </div>
+                                    <span className="text-xs font-bold text-black dark:text-white">
+                                      IDR {entry.value.toLocaleString('id-ID')}
+                                    </span>
+                                  </div>
+                                ))}
+                                <div className="mt-2 pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-8">
+                                  <span className="text-xs font-medium text-muted-foreground">Net</span>
+                                  <span className={`text-xs font-bold ${(payload[0].value - payload[1].value) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                    IDR {(payload[0].value - payload[1].value).toLocaleString('id-ID')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="income" 
+                      name="Income"
+                      stroke="#10b981" 
+                      strokeWidth={3} 
+                      fillOpacity={1} 
+                      fill="url(#colorIncome)" 
+                      activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="expenses" 
+                      name="Expenses"
+                      stroke="#f43f5e" 
+                      strokeWidth={3} 
+                      fillOpacity={1} 
+                      fill="url(#colorExpenses)" 
+                      activeDot={{ r: 6, strokeWidth: 0, fill: '#f43f5e' }}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (

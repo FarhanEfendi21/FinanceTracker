@@ -28,7 +28,7 @@ export default function DashboardHeader({ user }: { user?: any }) {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-md transition-colors duration-500">
+    <header className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-background/80 backdrop-blur-md transition-colors duration-500">
       <div className="flex items-center justify-between px-4 py-4 md:px-8">
         <div className="flex items-center gap-3 lg:hidden">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black dark:bg-white text-white dark:text-black shadow-md">
@@ -54,7 +54,7 @@ export default function DashboardHeader({ user }: { user?: any }) {
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 rounded-2xl p-2 dark:bg-[#1f1f1f] dark:border-white/5" align="end">
+                <DropdownMenuContent className="w-56 rounded-2xl p-2 dark:bg-popover dark:border-white/5" align="end">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none text-black dark:text-white">My Account</p>

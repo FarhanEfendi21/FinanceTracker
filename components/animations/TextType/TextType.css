@@ -1,0 +1,29 @@
+.text-type-container {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+  padding: 0;
+}
+
+.text-type-content {
+  display: inline-block;
+  white-space: pre-wrap;
+  color: inherit;
+}
+
+/* Specific styling for hero-text-type className as requested */
+.hero-text-type {
+  font-size: clamp(1.5rem, 4vw + 1rem, 3.5rem);
+  text-align: center;
+}
+
+.text-type-cursor {
+  display: inline-block;
+  font-weight: 300;
+  color: var(--primary, #3b82f6);
+  margin-left: 2px;
+  transform: translateY(-2%);
+}
