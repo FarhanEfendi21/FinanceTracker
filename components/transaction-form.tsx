@@ -49,7 +49,9 @@ export default function TransactionForm({ onTransactionAdded }: { onTransactionA
     fetchCategories()
   }, [supabase])
 
-  const filteredCategories = categories.filter(c => c.type === type)
+  const filteredCategories = categories
+    .filter(c => c.type === type)
+    .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i)
 
   const handleTypeChange = (newType: 'income' | 'expense') => {
     setType(newType)
