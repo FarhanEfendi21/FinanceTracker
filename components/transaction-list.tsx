@@ -39,7 +39,8 @@ function EditTransactionModal({
   transaction, 
   open, 
   onClose, 
-  onUpdate 
+  onUpdate,
+  categories
 }: { 
   transaction: any
   open: boolean
@@ -55,7 +56,9 @@ function EditTransactionModal({
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
-  const filteredCategories = categories.filter(c => c.type === type)
+  const filteredCategories = categories
+    .filter(c => c.type === type)
+    .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i)
 
   const handleSave = async () => {
     if (!category || !amount) return
