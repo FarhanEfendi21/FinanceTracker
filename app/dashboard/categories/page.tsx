@@ -224,47 +224,63 @@ export default function CategoriesPage() {
           </Dialog>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((cat) => {
-            const IconComponent = iconOptions.find(i => i.name === cat.icon)?.icon || Tag
+        <div className="space-y-12">
+          {(['income', 'expense'] as const).map((type) => {
+            const filteredCats = categories.filter(c => c.type === type);
+            const title = type === 'expense' ? 'Expense' : 'Income';
+            
             return (
-              <div 
-                key={cat.id} 
-                className="group relative flex items-center justify-between rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-6 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 text-black dark:text-white">
-                    <IconComponent className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-black dark:text-white">{cat.name}</h4>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{cat.type}</p>
-                  </div>
+              <div key={type} className="space-y-6">
+                <div className="flex items-center gap-2 px-2">
+                  <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground">{title}</h3>
+                  <span className="rounded-full bg-black/5 dark:bg-white/5 px-3 py-1 text-[10px] font-bold text-muted-foreground">
+                    {filteredCats.length}
+                  </span>
                 </div>
+                
+                {filteredCats.length === 0 && !loading ? (
+                  <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-black/10 dark:border-white/10 py-12 text-center">
+                    <p className="text-xs font-medium text-muted-foreground">No {type} categories</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredCats.map((cat) => {
+                      const IconComponent = iconOptions.find(i => i.name === cat.icon)?.icon || Tag
+                      const iconBgColor = type === 'expense' 
+                        ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400' 
+                        : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'
+                      
+                      return (
+                        <div 
+                          key={cat.id} 
+                          className="group relative flex items-center justify-between rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-6 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${iconBgColor}`}>
+                              <IconComponent className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-black dark:text-white">{cat.name}</h4>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{cat.type}</p>
+                            </div>
+                          </div>
 
-                <Button
-                  onClick={() => handleDeleteCategory(cat.id)}
-                  variant="ghost"
-                  size="sm"
-                  className="h-10 w-10 rounded-xl text-muted-foreground opacity-0 transition-opacity hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400 group-hover:opacity-100"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                          <Button
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-10 w-10 rounded-xl text-muted-foreground opacity-0 transition-opacity hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400 group-hover:opacity-100"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )
           })}
-
-          {categories.length === 0 && !loading && (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-black/10 dark:border-white/10 py-20 text-center">
-              <div className="mb-4 rounded-full bg-black/5 dark:bg-white/5 p-4 text-muted-foreground">
-                <Tag className="h-10 w-10" />
-              </div>
-              <h3 className="text-lg font-bold text-black dark:text-white">No Custom Categories</h3>
-              <p className="max-w-[280px] text-xs font-medium text-muted-foreground mt-2">
-                Create categories to start tracking your finances more specifically.
-              </p>
-            </div>
-          )}
         </div>
       </main>
     </div>
