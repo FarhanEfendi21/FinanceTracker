@@ -133,7 +133,7 @@ function EditTransactionModal({
               <Input
                 type="number"
                 min="1"
-                className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold focus-visible:ring-0"
+                className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold font-mono tabular-nums tracking-tight focus-visible:ring-0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
@@ -263,7 +263,7 @@ export default function TransactionList({
 
                   <div className="flex items-center gap-2">
                     <div className="text-right mr-2">
-                      <p className={`text-sm font-bold ${type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-black dark:text-white'}`}>
+                      <p className={`text-sm font-bold font-mono tabular-nums tracking-tight ${type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-black dark:text-white'}`}>
                         {type === 'income' ? '+' : '-'} IDR {parseFloat(transaction.amount).toLocaleString('id-ID')}
                       </p>
                     </div>
