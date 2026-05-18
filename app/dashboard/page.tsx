@@ -9,7 +9,6 @@ import TransactionList from '@/components/transaction-list'
 import DashboardStats from '@/components/dashboard-stats'
 import { TextType } from '@/components/animations/TextType/TextType'
 import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { motion } from 'framer-motion'
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null)
@@ -85,10 +85,15 @@ export default function Dashboard() {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="h-11 rounded-2xl bg-black dark:bg-white font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 transition-all hover:scale-[1.02] active:scale-[0.98]">
+              <motion.button 
+                className="h-11 rounded-2xl bg-black dark:bg-white px-5 font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 flex items-center justify-center cursor-pointer"
+                whileHover={{ scale: 1.03, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 15 }}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Transaction
-              </Button>
+              </motion.button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-[2.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8">
               <DialogHeader className="mb-4">
@@ -124,12 +129,15 @@ export default function Dashboard() {
       </main>
 
       {/* Mobile FAB */}
-      <button
-        className="fixed bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-black dark:bg-white text-white dark:text-black shadow-2xl shadow-black/20 dark:shadow-white/5 lg:hidden z-40 transition-transform hover:scale-105 active:scale-95"
+      <motion.button
+        className="fixed bottom-24 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-black dark:bg-white text-white dark:text-black shadow-2xl shadow-black/25 dark:shadow-white/10 lg:hidden z-40 cursor-pointer"
         onClick={() => setIsDialogOpen(true)}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92, rotate: -4 }}
+        transition={{ type: "spring", stiffness: 400, damping: 14 }}
       >
         <Plus className="h-6 w-6" />
-      </button>
+      </motion.button>
     </div>
   )
 }
