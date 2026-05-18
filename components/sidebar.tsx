@@ -115,27 +115,6 @@ export default function Sidebar() {
           </div>
         )}
       </aside>
-
-
-      {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around border-t border-black/5 dark:border-white/5 bg-white/80 dark:bg-black/80 p-4 backdrop-blur-xl lg:hidden transition-colors duration-500">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center gap-1 transition-all",
-                isActive ? "text-black dark:text-white" : "text-muted-foreground"
-              )}
-            >
-              <item.icon className={cn("h-6 w-6", isActive && "fill-black/10 dark:fill-white/10")} />
-              <span className="text-[10px] font-bold uppercase tracking-tighter">{item.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
     </>
   )
 }
