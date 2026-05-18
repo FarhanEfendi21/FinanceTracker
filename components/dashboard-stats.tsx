@@ -3,6 +3,30 @@
 import { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 import { Wallet, ArrowUpRight, ArrowDownRight, TrendingDown } from 'lucide-react'
+import { motion } from 'framer-motion'
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="backdrop-blur-md bg-white/90 dark:bg-card/90 border border-black/5 dark:border-white/10 rounded-[1.5rem] p-4 shadow-xl shadow-black/5 dark:shadow-white/5 space-y-2 pointer-events-none">
+        {label && <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>}
+        <div className="space-y-1.5">
+          {payload.map((item: any, index: number) => (
+            <div key={index} className="flex items-center gap-4 justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color || item.fill }} />
+                <span className="text-xs font-semibold text-muted-foreground">{item.name}</span>
+              </div>
+              <span className="text-xs font-bold font-mono tabular-nums tracking-tight text-black dark:text-white">
+                IDR {item.value.toLocaleString('id-ID')}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  return null
+}
 
 export default function DashboardStats({ transactions }: { transactions: any[] }) {
   const stats = useMemo(() => {
@@ -95,7 +119,7 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
     return { income, expenses, balance, incomeChange, expensesChange, expensesByCategory, monthlyTrend }
   }, [transactions])
 
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e']
+  const COLORS = ['#0d9488', '#2563eb', '#d97706', '#7c3aed', '#e11d48']
 
   const formatChange = (change: number | null) => {
     if (change === null) return null
@@ -108,14 +132,23 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
       {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Balance Card */}
-        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+        <motion.div 
+          className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 cursor-default shadow-sm"
+          whileHover={{ 
+            y: -6,
+            scale: 1.015,
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)"
+          }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ type: "spring", stiffness: 350, damping: 18 }}
+        >
           <div className="relative z-10">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/20 dark:shadow-white/5">
               <Wallet className="h-6 w-6" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">Total Balance</p>
             <div className="mt-1">
-              <h2 className={`text-3xl font-bold tracking-tight ${stats.balance >= 0 ? 'text-black dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
+              <h2 className={`text-3xl font-bold font-mono tabular-nums tracking-tight ${stats.balance >= 0 ? 'text-black dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
                 IDR {Math.abs(stats.balance).toLocaleString('id-ID')}
               </h2>
               {stats.balance < 0 && (
@@ -124,17 +157,26 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
             </div>
           </div>
           <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-black/[0.02] dark:bg-white/[0.02] transition-transform group-hover:scale-150" />
-        </div>
+        </motion.div>
 
         {/* Income Card */}
-        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+        <motion.div 
+          className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 cursor-default shadow-sm"
+          whileHover={{ 
+            y: -6,
+            scale: 1.015,
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)"
+          }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ type: "spring", stiffness: 350, damping: 18 }}
+        >
           <div className="relative z-10">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">
               <ArrowUpRight className="h-6 w-6" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">This Month's Income</p>
             <div className="mt-1">
-              <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white">
+              <h2 className="text-3xl font-bold font-mono tabular-nums tracking-tight text-black dark:text-white">
                 IDR {stats.income.toLocaleString('id-ID')}
               </h2>
               {stats.incomeChange !== null && (
@@ -145,17 +187,26 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
             </div>
           </div>
           <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-emerald-500/[0.03] transition-transform group-hover:scale-150" />
-        </div>
+        </motion.div>
 
         {/* Expenses Card */}
-        <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 transition-all hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+        <motion.div 
+          className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8 cursor-default shadow-sm"
+          whileHover={{ 
+            y: -6,
+            scale: 1.015,
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)"
+          }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ type: "spring", stiffness: 350, damping: 18 }}
+        >
           <div className="relative z-10">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400">
               <ArrowDownRight className="h-6 w-6" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">This Month's Expenses</p>
             <div className="mt-1">
-              <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white">
+              <h2 className="text-3xl font-bold font-mono tabular-nums tracking-tight text-black dark:text-white">
                 IDR {stats.expenses.toLocaleString('id-ID')}
               </h2>
               {stats.expensesChange !== null && (
@@ -166,7 +217,7 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
             </div>
           </div>
           <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-rose-500/[0.03] transition-transform group-hover:scale-150" />
-        </div>
+        </motion.div>
       </div>
 
       {/* Charts */}
@@ -188,18 +239,26 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.monthlyTrend} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
-                <CartesianGrid vertical={false} horizontal={false} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontWeight: 500 }} tickFormatter={(v) => v === 0 ? '' : `${(v/1000).toFixed(0)}k`} />
+              <BarChart data={stats.monthlyTrend} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={3}>
+                <defs>
+                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.85} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.25} />
+                  </linearGradient>
+                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.85} />
+                    <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.25} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="rgba(161, 161, 170, 0.08)" strokeDasharray="4 4" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(161, 161, 170, 0.7)', fontSize: 11, fontWeight: 500 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(161, 161, 170, 0.7)', fontSize: 11, fontWeight: 500 }} tickFormatter={(v) => v === 0 ? '' : `${(v/1000).toFixed(0)}k`} />
                 <Tooltip 
-                  cursor={{ fill: '#00000005' }}
-                  formatter={(value: any, name: string) => [`IDR ${value.toLocaleString('id-ID')}`, name.charAt(0).toUpperCase() + name.slice(1)]}
-                  contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', color: 'var(--foreground)' }}
-                  itemStyle={{ color: 'var(--foreground)' }}
+                  cursor={{ fill: 'rgba(0, 0, 0, 0.015)', radius: 8 }}
+                  content={<CustomTooltip />}
                 />
-                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="income" name="Income" fill="url(#incomeGrad)" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="expenses" name="Expenses" fill="url(#expenseGrad)" radius={[4, 4, 0, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -218,6 +277,28 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
                 <>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                      <defs>
+                        <linearGradient id="pieGrad0" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#0d9488" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#14b8a6" stopOpacity={0.65} />
+                        </linearGradient>
+                        <linearGradient id="pieGrad1" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#2563eb" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.65} />
+                        </linearGradient>
+                        <linearGradient id="pieGrad2" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#d97706" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.65} />
+                        </linearGradient>
+                        <linearGradient id="pieGrad3" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#7c3aed" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.65} />
+                        </linearGradient>
+                        <linearGradient id="pieGrad4" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#e11d48" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.65} />
+                        </linearGradient>
+                      </defs>
                       <Pie 
                         data={stats.expensesByCategory} 
                         cx="50%" 
@@ -228,23 +309,19 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
                         dataKey="value" 
                         stroke="none"
                         animationBegin={0}
-                        animationDuration={1500}
+                        animationDuration={1200}
                       >
                         {stats.expensesByCategory.map((_: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={`url(#pieGrad${index % 5})`} />
                         ))}
                       </Pie>
-                      <Tooltip 
-                        formatter={(value: any, name: string) => [`IDR ${value.toLocaleString('id-ID')}`, name]}
-                        contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', color: 'var(--foreground)' }}
-                        itemStyle={{ color: 'var(--foreground)' }}
-                      />
+                      <Tooltip content={<CustomTooltip />} />
                     </PieChart>
                   </ResponsiveContainer>
                   {/* Centered Total */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">Total</p>
-                    <p className="text-2xl font-bold text-black dark:text-white">
+                    <p className="text-2xl font-bold font-mono tabular-nums tracking-tight text-black dark:text-white">
                       IDR {stats.expenses.toLocaleString('id-ID')}
                     </p>
                   </div>
@@ -273,7 +350,7 @@ export default function DashboardStats({ transactions }: { transactions: any[] }
                         </span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-black dark:text-white group-hover:translate-x-[-4px] transition-transform">
+                    <span className="text-sm font-bold font-mono tabular-nums tracking-tight text-black dark:text-white group-hover:translate-x-[-4px] transition-transform">
                       IDR {cat.value.toLocaleString('id-ID')}
                     </span>
                   </div>
