@@ -16,7 +16,17 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 import { ThemeToggle } from '@/components/theme-toggle'
+import { RealTimeClock } from '@/components/real-time-clock'
 import BoringAvatar from 'boring-avatars'
+import { StaggeredMenu } from '@/components/staggered-menu'
+
+const navItems = [
+  { label: 'Overview', href: '/dashboard' },
+  { label: 'Transactions', href: '/dashboard/transactions' },
+  { label: 'Analytics', href: '/dashboard/analytics' },
+  { label: 'Categories', href: '/dashboard/categories' },
+  { label: 'Settings', href: '/dashboard/settings' },
+]
 
 export default function DashboardHeader({ user }: { user?: any }) {
   const router = useRouter()
@@ -38,6 +48,7 @@ export default function DashboardHeader({ user }: { user?: any }) {
         </div>
 
         <div className="ml-auto flex items-center gap-4">
+          <RealTimeClock />
           <ThemeToggle />
           {user && (
             <div className="lg:hidden">
@@ -82,6 +93,22 @@ export default function DashboardHeader({ user }: { user?: any }) {
               </DropdownMenu>
             </div>
           )}
+
+          <div className="lg:hidden">
+            <StaggeredMenu
+              position="right"
+              isFixed={true}
+              items={navItems.map(item => ({
+                label: item.label,
+                ariaLabel: `Go to ${item.label}`,
+                link: item.href
+              }))}
+              displaySocials={false}
+              displayItemNumbering={true}
+              colors={['rgba(255, 255, 255, 0.05)', '#0f172a', '#020617']}
+              accentColor="#3b82f6"
+            />
+          </div>
         </div>
       </div>
     </header>
