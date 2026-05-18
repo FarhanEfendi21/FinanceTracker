@@ -91,6 +91,17 @@ export default function CategoriesPage() {
   const handleAddCategory = async () => {
     if (!newCat.name) return
 
+    let currentUser = user
+    if (!currentUser) {
+      const { data: { user: fetchedUser } } = await supabase.auth.getUser()
+      if (!fetchedUser) {
+        toast.error('Authentication required. Please sign in.')
+        return
+      }
+      currentUser = fetchedUser
+      setUser(fetchedUser)
+    }
+
     // Client-side check for duplicate
     const exists = categories.find(
       c => c.name.toLowerCase() === newCat.name.toLowerCase() && c.type === newCat.type
@@ -103,7 +114,7 @@ export default function CategoriesPage() {
     const { data, error } = await supabase
       .from('categories')
       .insert([
-        { ...newCat, user_id: user.id }
+        { ...newCat, user_id: currentUser.id }
       ])
       .select()
 
