@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Wallet, ArrowRight, Loader2 } from 'lucide-react'
+import { ArrowRight, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import Logo from '@/components/logo'
 
 export default function Page() {
   const [fullName, setFullName] = useState('')
@@ -57,9 +58,7 @@ export default function Page() {
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F9F9F9] dark:bg-black p-6 md:p-10 transition-colors duration-500">
       <div className="w-full max-w-[400px] space-y-8">
         <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5">
-            <Wallet className="h-6 w-6" />
-          </div>
+          <Logo iconSize={48} showBg={true} className="rounded-2xl shadow-black/10 dark:shadow-white/5" />
           <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">FlowLedger</h1>
           <p className="text-sm text-muted-foreground">
             Create an account to start tracking your finances.
