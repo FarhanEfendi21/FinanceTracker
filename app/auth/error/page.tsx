@@ -1,5 +1,6 @@
-import { Wallet, AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import Logo from '@/components/logo'
 
 export default async function Page({
   searchParams,
@@ -12,9 +13,7 @@ export default async function Page({
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F9F9F9] p-6 md:p-10">
       <div className="w-full max-w-[400px] space-y-8">
         <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-white shadow-lg">
-            <Wallet className="h-6 w-6" />
-          </div>
+          <Logo iconSize={48} showBg={true} className="rounded-2xl shadow-lg" />
           <h1 className="text-3xl font-bold tracking-tight text-black">FlowLedger</h1>
         </div>
 
