@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import Logo from './logo'
 import { 
-  Wallet, 
   LayoutDashboard, 
   PieChart, 
   Tag,
@@ -61,9 +61,7 @@ export default function Sidebar() {
       {/* Desktop Sidebar */}
       <aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col border-r border-black/5 dark:border-white/5 bg-white dark:bg-card p-6 lg:flex transition-colors duration-500">
         <div className="mb-10 flex items-center gap-3 px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/20 dark:shadow-white/5">
-            <Wallet className="h-5 w-5" />
-          </div>
+          <Logo iconSize={40} showBg={true} className="rounded-xl shadow-black/20 dark:shadow-white/5" />
           <span className="text-xl font-bold tracking-tight text-black dark:text-white">FlowLedger</span>
         </div>
 

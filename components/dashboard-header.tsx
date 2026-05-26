@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { LogOut, Wallet, User, Settings } from 'lucide-react'
+import { LogOut, User, Settings } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { RealTimeClock } from '@/components/real-time-clock'
 import BoringAvatar from 'boring-avatars'
 import { StaggeredMenu } from '@/components/staggered-menu'
+import Logo from './logo'
 
 const navItems = [
   { label: 'Overview', href: '/dashboard' },
@@ -41,9 +42,7 @@ export default function DashboardHeader({ user }: { user?: any }) {
     <header className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-background/80 backdrop-blur-md transition-colors duration-500">
       <div className="flex items-center justify-between px-4 py-4 md:px-8">
         <div className="flex items-center gap-3 lg:hidden">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black dark:bg-white text-white dark:text-black shadow-md">
-            <Wallet className="h-5 w-5" />
-          </div>
+          <Logo iconSize={36} showBg={true} className="rounded-xl shadow-md" />
           <h1 className="text-lg font-bold tracking-tight text-black dark:text-white">FlowLedger</h1>
         </div>
 
