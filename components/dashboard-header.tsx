@@ -41,9 +41,9 @@ export default function DashboardHeader({ user }: { user?: any }) {
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-background/80 backdrop-blur-md transition-colors duration-500">
       <div className="flex items-center justify-between px-4 py-4 md:px-8">
-        <div className="flex items-center gap-3 lg:hidden">
-          <Logo iconSize={36} showBg={true} className="rounded-xl shadow-md" />
-          <h1 className="text-lg font-bold tracking-tight text-black dark:text-white">FlowLedger</h1>
+        <div className="flex items-center gap-2.5 lg:hidden">
+          <Logo iconSize={32} showBg={false} className="text-black dark:text-white" />
+          <h1 className="text-base font-bold tracking-tight text-black dark:text-white">FlowLedger</h1>
         </div>
 
         <div className="ml-auto flex items-center gap-4">
