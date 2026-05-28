@@ -87,8 +87,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Inter Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -151,3 +151,10 @@
     @apply bg-background text-foreground transition-colors duration-500;
   }
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
