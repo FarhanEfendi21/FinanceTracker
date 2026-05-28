@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
             <div className="rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Savings Rate</p>
               <div className="mt-2 flex items-baseline gap-2">
-                <h3 className="text-3xl font-bold text-black dark:text-white">{stats.savingsRate.toFixed(1)}%</h3>
+                <h3 className="text-3xl font-bold font-sans tabular-nums tracking-tight text-black dark:text-white">{stats.savingsRate.toFixed(1)}%</h3>
                 <span className={`text-xs font-medium flex items-center ${stats.savingsRate >= 20 ? 'text-emerald-600' : stats.savingsRate >= 0 ? 'text-amber-500' : 'text-rose-600'}`}>
                   {stats.savingsRate >= 20 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
                   {stats.savingsRate >= 20 ? 'Great' : stats.savingsRate >= 0 ? 'Fair' : 'Deficit'}
@@ -155,7 +155,7 @@ export default function AnalyticsPage() {
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground leading-relaxed">
-                  Saving {stats.savingsRate.toFixed(1)}% of income in the last {periodLabel}.
+                  Saving <span className="font-sans font-bold tabular-nums">{stats.savingsRate.toFixed(1)}%</span> of income in the last {periodLabel}.
                 </p>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
               </div>
               <p className="mt-4 text-[10px] text-muted-foreground leading-relaxed">
                 {stats.categoryData[0] 
-                  ? `IDR ${stats.categoryData[0].value.toLocaleString('id-ID')} spent in this period.`
+                  ? <><span className="font-sans font-bold tabular-nums">IDR {stats.categoryData[0].value.toLocaleString('id-ID')}</span> spent in this period.</>
                   : 'No expense data for this period.'}
               </p>
             </div>
@@ -175,7 +175,7 @@ export default function AnalyticsPage() {
             <div className="rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-8">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Monthly Avg Spend</p>
               <div className="mt-2">
-                <h3 className="text-2xl font-bold text-black dark:text-white">
+                <h3 className="text-2xl font-bold font-sans tabular-nums tracking-tight text-black dark:text-white">
                   IDR {Math.round(stats.totalExpenses / stats.monthCount).toLocaleString('id-ID')}
                 </h3>
               </div>
@@ -199,7 +199,7 @@ export default function AnalyticsPage() {
                     <div className="h-2 w-2 rounded-full bg-emerald-500" />
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Income</span>
                   </div>
-                  <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  <p className="text-sm font-bold font-sans tabular-nums tracking-tight text-emerald-600 dark:text-emerald-400">
                     IDR {stats.totalIncome.toLocaleString('id-ID')}
                   </p>
                 </div>
@@ -211,7 +211,7 @@ export default function AnalyticsPage() {
                     <div className="h-2 w-2 rounded-full bg-rose-500" />
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Expenses</span>
                   </div>
-                  <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                  <p className="text-sm font-bold font-sans tabular-nums tracking-tight text-rose-600 dark:text-rose-400">
                     IDR {stats.totalExpenses.toLocaleString('id-ID')}
                   </p>
                 </div>
@@ -223,7 +223,7 @@ export default function AnalyticsPage() {
                     <div className="h-2 w-2 rounded-full bg-black dark:bg-white opacity-20" />
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Net Savings</span>
                   </div>
-                  <p className={`text-sm font-bold ${(stats.totalIncome - stats.totalExpenses) >= 0 ? 'text-black dark:text-white' : 'text-rose-500'}`}>
+                  <p className={`text-sm font-bold font-sans tabular-nums tracking-tight ${(stats.totalIncome - stats.totalExpenses) >= 0 ? 'text-black dark:text-white' : 'text-rose-500'}`}>
                     IDR {(stats.totalIncome - stats.totalExpenses).toLocaleString('id-ID')}
                   </p>
                 </div>
@@ -272,14 +272,14 @@ export default function AnalyticsPage() {
                                       <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: entry.color }} />
                                       <span className="text-xs font-medium text-muted-foreground">{entry.name}</span>
                                     </div>
-                                    <span className="text-xs font-bold text-black dark:text-white">
+                                    <span className="text-xs font-bold font-sans tabular-nums text-black dark:text-white">
                                       IDR {entry.value.toLocaleString('id-ID')}
                                     </span>
                                   </div>
                                 ))}
                                 <div className="mt-2 pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-8">
                                   <span className="text-xs font-medium text-muted-foreground">Net</span>
-                                  <span className={`text-xs font-bold ${(payload[0].value - payload[1].value) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                  <span className={`text-xs font-bold font-sans tabular-nums ${(payload[0].value - payload[1].value) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                                     IDR {(payload[0].value - payload[1].value).toLocaleString('id-ID')}
                                   </span>
                                 </div>
@@ -344,8 +344,8 @@ export default function AnalyticsPage() {
                       <div key={cat.name} className="flex items-center gap-3">
                         <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                         <span className="text-xs font-bold text-black dark:text-white uppercase truncate flex-1">{cat.name}</span>
-                        <span className="text-xs font-bold text-black dark:text-white">IDR {cat.value.toLocaleString('id-ID')}</span>
-                        <span className="text-[10px] font-medium text-muted-foreground w-8 text-right">
+                        <span className="text-xs font-bold font-sans tabular-nums text-black dark:text-white">IDR {cat.value.toLocaleString('id-ID')}</span>
+                        <span className="text-[10px] font-sans font-bold tabular-nums text-muted-foreground w-8 text-right">
                           {((cat.value / stats.totalExpenses) * 100).toFixed(0)}%
                         </span>
                       </div>
