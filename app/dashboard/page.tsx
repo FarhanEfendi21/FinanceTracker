@@ -7,6 +7,7 @@ import DashboardHeader from '@/components/dashboard-header'
 import TransactionForm from '@/components/transaction-form'
 import TransactionList from '@/components/transaction-list'
 import DashboardStats from '@/components/dashboard-stats'
+import BudgetAlertWidget from '@/components/budget-alert-widget'
 import { TextType } from '@/components/animations/TextType/TextType'
 import { Plus } from 'lucide-react'
 import {
@@ -109,14 +110,17 @@ export default function Dashboard() {
 
         <div className="space-y-12">
           {/* Stats Section */}
-          <DashboardStats transactions={transactions} />
+          <DashboardStats transactions={transactions} loading={loading} />
+
+          {/* Budget Alerts */}
+          <BudgetAlertWidget />
 
           {/* Recent Activity */}
           <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
               <h3 className="text-sm font-bold uppercase tracking-widest text-black dark:text-white">Recent Activity</h3>
               <span className="text-xs font-medium text-muted-foreground">
-                {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
+                <span className="font-sans tabular-nums">{transactions.length}</span> {transactions.length === 1 ? 'entry' : 'entries'}
               </span>
             </div>
             <TransactionList
