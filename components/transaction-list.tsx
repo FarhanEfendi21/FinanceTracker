@@ -28,8 +28,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2, ArrowUpRight, ArrowDownRight, Tag, Calendar, Pencil, Loader2, Utensils, Car, Zap, Film, Heart, ShoppingBag, Briefcase, Coins, Gift, Wallet } from 'lucide-react'
+import { Trash2, ArrowUpRight, ArrowDownRight, Tag, Pencil, Loader2, Utensils, Car, Zap, Film, Heart, ShoppingBag, Briefcase, Coins, Gift, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
+import { TransactionListSkeleton } from '@/components/skeletons'
+
 
 const iconMap: Record<string, any> = {
   Utensils, Car, Zap, Film, Heart, ShoppingBag, Briefcase, Coins, Gift, Wallet, Tag
@@ -133,7 +135,7 @@ function EditTransactionModal({
               <Input
                 type="number"
                 min="1"
-                className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold font-mono tabular-nums tracking-tight focus-visible:ring-0"
+                className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold font-sans tabular-nums tracking-tight focus-visible:ring-0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />
@@ -201,6 +203,32 @@ export default function TransactionList({
     return <IconComp className="h-6 w-6" />
   }
 
+  const getCategoryStyle = (categoryName: string, type: string) => {
+    const cat = categories.find(c => c.name === categoryName && c.type === type)
+    if (cat?.color && cat.color !== '#000000') {
+      // Convert hex color to low-opacity background
+      return {
+        container: { backgroundColor: `${cat.color}18`, color: cat.color },
+        iconColor: cat.color,
+      }
+    }
+    // Default fallback per type
+    return type === 'income'
+      ? { container: { backgroundColor: 'rgba(16,185,129,0.08)', color: '#10b981' }, iconColor: '#10b981' }
+      : { container: { backgroundColor: 'rgba(244,63,94,0.08)', color: '#f43f5e' }, iconColor: '#f43f5e' }
+  }
+
+  // ── Date grouping helper ────────────────────────────
+  const getDateLabel = (dateStr: string) => {
+    const tx = new Date(dateStr)
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    if (tx.toDateString() === today.toDateString()) return 'Hari ini'
+    if (tx.toDateString() === yesterday.toDateString()) return 'Kemarin'
+    return tx.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })
+  }
+
   const handleDelete = async (id: string) => {
     setDeletingId(id)
     const { error } = await supabase.from('transactions').delete().eq('id', id)
@@ -221,6 +249,15 @@ export default function TransactionList({
     const startIndex = (currentPage - 1) * itemsPerPage
     const paginatedData = data.slice(startIndex, startIndex + itemsPerPage)
 
+    // Group by date
+    const groups: { label: string; items: any[] }[] = []
+    paginatedData.forEach(tx => {
+      const label = getDateLabel(tx.date)
+      const existing = groups.find(g => g.label === label)
+      if (existing) existing.items.push(tx)
+      else groups.push({ label, items: [tx] })
+    })
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
@@ -236,72 +273,87 @@ export default function TransactionList({
           </div>
         ) : (
           <>
-            <div className="space-y-3">
-              {paginatedData.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="group flex items-center justify-between rounded-[1.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-5 transition-all hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                      type === 'income' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400'
-                    }`}>
-                      {getCategoryIcon(transaction.category, transaction.type)}
-                    </div>
-                    
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-black dark:text-white">{transaction.category}</span>
-                      <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        {transaction.description && <span className="truncate max-w-[100px]">{transaction.description}</span>}
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(transaction.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                        </div>
-                      </div>
-                    </div>
+            <div className="space-y-1">
+              {groups.map((group) => (
+                <div key={group.label}>
+                  {/* Date Divider */}
+                  <div className="flex items-center gap-3 py-2 px-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 whitespace-nowrap">
+                      {group.label}
+                    </span>
+                    <div className="h-px flex-1 bg-black/5 dark:bg-white/5" />
                   </div>
-
-                  <div className="flex items-center gap-2">
-                    <div className="text-right mr-2">
-                      <p className={`text-sm font-bold font-mono tabular-nums tracking-tight ${type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-black dark:text-white'}`}>
-                        {type === 'income' ? '+' : '-'} IDR {parseFloat(transaction.amount).toLocaleString('id-ID')}
-                      </p>
-                    </div>
-
-                    <Button
-                      onClick={() => setEditingTransaction(transaction)}
-                      variant="ghost"
-                      size="sm"
-                      className="h-9 w-9 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-9 w-9 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-600"
+                  {/* Items within group */}
+                  <div className="space-y-2">
+                    {group.items.map((transaction) => {
+                      const catStyle = getCategoryStyle(transaction.category, transaction.type)
+                      return (
+                        <div
+                          key={transaction.id}
+                          className="group flex items-center justify-between rounded-[1.5rem] border border-black/5 dark:border-white/5 bg-white dark:bg-card p-5 transition-all hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5"
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="rounded-[2rem]">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Transaction?</AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(transaction.id)}
-                            className="rounded-xl bg-rose-600 text-white"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          <div className="flex items-center gap-4">
+                            <div
+                              className="flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 transition-transform group-hover:scale-105"
+                              style={catStyle.container}
+                            >
+                              {getCategoryIcon(transaction.category, transaction.type)}
+                            </div>
+
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-black dark:text-white">{transaction.category}</span>
+                              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                {transaction.description && <span className="truncate max-w-[100px]">{transaction.description}</span>}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="text-right mr-2">
+                              <p className={`text-sm font-bold font-sans tabular-nums tracking-tight`}
+                                style={{ color: catStyle.iconColor }}>
+                                {type === 'income' ? '+' : '-'} IDR {parseFloat(transaction.amount).toLocaleString('id-ID')}
+                              </p>
+                            </div>
+
+                            <Button
+                              onClick={() => setEditingTransaction(transaction)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-9 w-9 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-600"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="rounded-[2rem]">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Transaction?</AlertDialogTitle>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(transaction.id)}
+                                    className="rounded-xl bg-rose-600 text-white"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
@@ -337,14 +389,9 @@ export default function TransactionList({
   }
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 w-full animate-pulse rounded-2xl bg-black/[0.03]" />
-        ))}
-      </div>
-    )
+    return <TransactionListSkeleton />
   }
+
 
   return (
     <>
