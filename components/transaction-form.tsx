@@ -158,7 +158,7 @@ export default function TransactionForm({ onTransactionAdded }: { onTransactionA
               type="number"
               placeholder="0"
               min="1"
-              className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold font-mono tabular-nums tracking-tight focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-12 rounded-2xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] pl-12 font-bold font-sans tabular-nums tracking-tight focus-visible:ring-0 focus-visible:ring-offset-0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
