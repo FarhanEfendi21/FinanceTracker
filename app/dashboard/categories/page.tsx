@@ -244,7 +244,7 @@ export default function CategoriesPage() {
               <div key={type} className="space-y-6">
                 <div className="flex items-center gap-2 px-2">
                   <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground">{title}</h3>
-                  <span className="rounded-full bg-black/5 dark:bg-white/5 px-3 py-1 text-[10px] font-bold text-muted-foreground">
+                  <span className="rounded-full bg-black/5 dark:bg-white/5 px-3 py-1 text-[10px] font-sans font-bold tabular-nums text-muted-foreground">
                     {filteredCats.length}
                   </span>
                 </div>
