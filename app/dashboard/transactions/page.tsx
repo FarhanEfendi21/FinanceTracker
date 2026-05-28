@@ -192,7 +192,7 @@ export default function TransactionsPage() {
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
                 Filter
                 {hasActiveFilters && (
-                  <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-bold">
+                  <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-sans font-bold tabular-nums">
                     {[typeFilter !== 'all', !!dateFrom, !!dateTo].filter(Boolean).length}
                   </span>
                 )}
@@ -252,7 +252,7 @@ export default function TransactionsPage() {
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-sm font-bold uppercase tracking-widest text-black dark:text-white">History</h3>
               <span className="rounded-full bg-black/5 dark:bg-white/5 px-3 py-1 text-xs font-bold text-black dark:text-white">
-                {filteredTransactions.length} {filteredTransactions.length === 1 ? 'item' : 'items'}
+                <span className="font-sans tabular-nums">{filteredTransactions.length}</span> {filteredTransactions.length === 1 ? 'item' : 'items'}
               </span>
             </div>
             <TransactionList 
