@@ -17,7 +17,7 @@ export function RealTimeClock() {
 
   return (
     <time 
-      className="text-xs sm:text-sm font-medium tracking-widest text-muted-foreground/80 tabular-nums" 
+      className="text-xs sm:text-sm font-sans font-medium tracking-widest text-muted-foreground/80 tabular-nums" 
       suppressHydrationWarning
     >
       {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
