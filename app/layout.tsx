@@ -9,10 +9,10 @@ export const viewport: Viewport = {
   themeColor: '#000000',
 }
 import './globals.css'
-import { Geist_Mono, Inter as V0_Font_Inter, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
+import { Montserrat as V0_Font_Montserrat, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
 
 // Initialize fonts
-const inter = V0_Font_Inter({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700","800","900"], variable: '--font-sans' })
+const montserrat = V0_Font_Montserrat({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700","800","900"], variable: '--font-sans' })
 const geistMono = V0_Font_Geist_Mono({ subsets: ['latin'], weight: ["100","200","300","400","500","600","700","800","900"], variable: '--font-mono' })
 const _sourceSerif_4 = V0_Font_Source_Serif_4({ subsets: ['latin'], weight: ["200","300","400","500","600","700","800","900"] })
 
@@ -50,7 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-background`}>
+      <body className={`${montserrat.variable} ${geistMono.variable} font-sans antialiased bg-background`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
