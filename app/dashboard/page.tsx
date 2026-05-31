@@ -66,7 +66,7 @@ export default function Dashboard() {
 
       <main className="mx-auto max-w-7xl px-4 py-8 md:px-8 pb-24 lg:pb-8">
         {/* Page Header */}
-        <div className="mb-10 flex items-end justify-between">
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tight text-black dark:text-white mb-2">
               <TextType
@@ -87,7 +87,7 @@ export default function Dashboard() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <motion.button 
-                className="h-11 rounded-2xl bg-black dark:bg-white px-5 font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 flex items-center justify-center cursor-pointer"
+                className="hidden lg:flex h-11 rounded-2xl bg-black dark:bg-white px-5 font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 items-center justify-center cursor-pointer"
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 450, damping: 15 }}
