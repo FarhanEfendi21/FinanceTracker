@@ -10,7 +10,8 @@ import {
   Settings,
   History,
   LogOut,
-  Wallet2
+  Wallet2,
+  Target
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import BoringAvatar from 'boring-avatars'
@@ -37,6 +38,11 @@ const workspaceItems = [
     label: 'Budget',
     href: '/dashboard/budget',
     icon: Wallet2
+  },
+  {
+    label: 'Goals',
+    href: '/dashboard/goals',
+    icon: Target
   },
   {
     label: 'Categories',
