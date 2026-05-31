@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { LogOut, User, Settings } from 'lucide-react'
@@ -25,12 +25,15 @@ const navItems = [
   { label: 'Overview', href: '/dashboard' },
   { label: 'Transactions', href: '/dashboard/transactions' },
   { label: 'Analytics', href: '/dashboard/analytics' },
+  { label: 'Budget', href: '/dashboard/budget' },
+  { label: 'Goals', href: '/dashboard/goals' },
   { label: 'Categories', href: '/dashboard/categories' },
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 
 export default function DashboardHeader({ user }: { user?: any }) {
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   const handleLogout = async () => {
@@ -56,11 +59,11 @@ export default function DashboardHeader({ user }: { user?: any }) {
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 hover:bg-black/5 dark:hover:bg-white/5 ring-offset-background transition-all active:scale-95">
                     <div className="h-10 w-10 overflow-hidden rounded-full border border-black/5 dark:border-white/5">
                       <BoringAvatar
-                        size={40}
-                        name={user.email || 'user'}
-                        variant="beam"
-                        colors={['#FFAD08', '#EDD75A', '#73B06F', '#0C8F8F', '#405059']}
-                      />
+                         size={40}
+                         name={user.email || 'user'}
+                         variant="beam"
+                         colors={['#FFAD08', '#EDD75A', '#73B06F', '#0C8F8F', '#405059']}
+                       />
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
@@ -104,8 +107,9 @@ export default function DashboardHeader({ user }: { user?: any }) {
               }))}
               displaySocials={false}
               displayItemNumbering={true}
-              colors={['rgba(255, 255, 255, 0.05)', '#0f172a', '#020617']}
+              colors={['#3b82f6', 'var(--background)']}
               accentColor="#3b82f6"
+              currentPath={pathname}
             />
           </div>
         </div>
