@@ -2,13 +2,18 @@
 
 import React, { useCallback, useLayoutEffect, useRef, useState, useEffect } from 'react'
 import { gsap } from 'gsap'
-import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import * as LucideIcons from 'lucide-react'
 import './staggered-menu.css'
+
+// Safely get Github icon with fallbacks for different versions of lucide-react
+const Github = (LucideIcons as any).Github || (LucideIcons as any).GitHub || (LucideIcons as any).GithubIcon
 
 export interface StaggeredMenuItem {
   label: string
-  ariaLabel: string
+  ariaLabel?: string
   link: string
+  icon?: React.ReactNode
 }
 
 export interface StaggeredMenuSocialItem {
@@ -24,7 +29,6 @@ export interface StaggeredMenuProps {
   displaySocials?: boolean
   displayItemNumbering?: boolean
   className?: string
-  logoUrl?: string
   menuButtonColor?: string
   openMenuButtonColor?: string
   accentColor?: string
@@ -33,37 +37,43 @@ export interface StaggeredMenuProps {
   closeOnClickAway?: boolean
   onMenuOpen?: () => void
   onMenuClose?: () => void
+  headerLeft?: React.ReactNode
+  headerRight?: React.ReactNode
+  currentPath?: string
+  githubUrl?: string
 }
 
-export function StaggeredMenu({
+export const StaggeredMenu = ({
   position = 'right',
-  colors = ['#B497CF', '#5227FF'],
+  colors = ['var(--primary)', 'color-mix(in oklch, var(--primary), transparent 50%)'],
   items = [],
   socialItems = [],
-  displaySocials = true,
-  displayItemNumbering = true,
+  displaySocials = false,
+  displayItemNumbering = false,
   className,
-  logoUrl = '',
-  menuButtonColor = 'currentColor',
-  openMenuButtonColor = 'currentColor',
-  accentColor = '#5227FF',
+  menuButtonColor = 'var(--foreground)',
+  openMenuButtonColor = 'var(--foreground)',
+  accentColor = 'var(--primary)',
   changeMenuColorOnOpen = true,
-  isFixed = false,
+  isFixed = true,
   closeOnClickAway = true,
   onMenuOpen,
-  onMenuClose
-}: StaggeredMenuProps) {
+  onMenuClose,
+  headerLeft,
+  headerRight,
+  currentPath,
+  githubUrl = "https://github.com/FarhanEfendi21/FinanceTracker.git"
+}: StaggeredMenuProps) => {
   const [open, setOpen] = useState(false)
   const openRef = useRef(false)
-  const panelRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLElement>(null)
   const preLayersRef = useRef<HTMLDivElement>(null)
-  const preLayerElsRef = useRef<HTMLDivElement[]>([])
-  const toggleBtnRef = useRef<HTMLButtonElement>(null)
-  const busyRef = useRef(false)
+  const preLayerElsRef = useRef<HTMLElement[]>([])
 
   const openTlRef = useRef<gsap.core.Timeline | null>(null)
   const closeTweenRef = useRef<gsap.core.Tween | null>(null)
-  const colorTweenRef = useRef<gsap.core.Tween | null>(null)
+  const toggleBtnRef = useRef<HTMLButtonElement>(null)
+  const busyRef = useRef(false)
   const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null)
 
   useLayoutEffect(() => {
@@ -72,7 +82,7 @@ export function StaggeredMenu({
       const preContainer = preLayersRef.current
       if (!panel) return
 
-      let preLayers: HTMLDivElement[] = []
+      let preLayers: HTMLElement[] = []
       if (preContainer) {
         preLayers = Array.from(preContainer.querySelectorAll('.sm-prelayer'))
       }
@@ -83,10 +93,9 @@ export function StaggeredMenu({
       if (preContainer) {
         gsap.set(preContainer, { xPercent: 0, opacity: 1 })
       }
-      if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor })
     })
     return () => ctx.revert()
-  }, [menuButtonColor, position])
+  }, [position])
 
   const buildOpenTimeline = useCallback(() => {
     const panel = panelRef.current
@@ -104,9 +113,10 @@ export function StaggeredMenu({
     const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'))
     const socialTitle = panel.querySelector('.sm-socials-title')
     const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'))
+    const githubLink = panel.querySelector('.sm-github-link')
 
     const offscreen = position === 'left' ? -100 : 100
-    const layerStates = layers.map(el => ({ el, start: offscreen }))
+    const layerStates = layers.map((el) => ({ el, start: offscreen }))
     const panelStart = offscreen
 
     if (itemEls.length) {
@@ -120,6 +130,9 @@ export function StaggeredMenu({
     }
     if (socialLinks.length) {
       gsap.set(socialLinks, { y: 25, opacity: 0 })
+    }
+    if (githubLink) {
+      gsap.set(githubLink, { y: 20, opacity: 0 })
     }
 
     const tl = gsap.timeline({ paused: true })
@@ -165,8 +178,9 @@ export function StaggeredMenu({
       }
     }
 
+    const bottomElementsStart = panelInsertTime + panelDuration * 0.4
+
     if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.4
       if (socialTitle) {
         tl.to(
           socialTitle,
@@ -175,7 +189,7 @@ export function StaggeredMenu({
             duration: 0.5,
             ease: 'power2.out'
           },
-          socialsStart
+          bottomElementsStart
         )
       }
       if (socialLinks.length) {
@@ -191,9 +205,22 @@ export function StaggeredMenu({
               gsap.set(socialLinks, { clearProps: 'opacity' })
             }
           },
-          socialsStart + 0.04
+          bottomElementsStart + 0.04
         )
       }
+    }
+
+    if (githubLink) {
+      tl.to(
+        githubLink,
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power4.out'
+        },
+        bottomElementsStart + 0.15
+      )
     }
 
     openTlRef.current = tl
@@ -244,55 +271,12 @@ export function StaggeredMenu({
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'))
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 })
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 })
+        const githubLink = panel.querySelector('.sm-github-link')
+        if (githubLink) gsap.set(githubLink, { y: 20, opacity: 0 })
         busyRef.current = false
       }
     })
   }, [position])
-
-  const animateColor = useCallback(
-    (opening: boolean) => {
-      const btn = toggleBtnRef.current
-      if (!btn) return
-      colorTweenRef.current?.kill()
-      if (changeMenuColorOnOpen) {
-        const targetColor = opening ? openMenuButtonColor : menuButtonColor
-        colorTweenRef.current = gsap.to(btn, {
-          color: targetColor,
-          delay: 0.18,
-          duration: 0.3,
-          ease: 'power2.out'
-        })
-      } else {
-        gsap.set(btn, { color: menuButtonColor })
-      }
-    },
-    [openMenuButtonColor, menuButtonColor, changeMenuColorOnOpen]
-  )
-
-  useEffect(() => {
-    if (toggleBtnRef.current) {
-      if (changeMenuColorOnOpen) {
-        const targetColor = openRef.current ? openMenuButtonColor : menuButtonColor
-        gsap.set(toggleBtnRef.current, { color: targetColor })
-      } else {
-        gsap.set(toggleBtnRef.current, { color: menuButtonColor })
-      }
-    }
-  }, [changeMenuColorOnOpen, menuButtonColor, openMenuButtonColor])
-
-  const toggleMenu = useCallback(() => {
-    const target = !openRef.current
-    openRef.current = target
-    setOpen(target)
-    if (target) {
-      onMenuOpen?.()
-      playOpen()
-    } else {
-      onMenuClose?.()
-      playClose()
-    }
-    animateColor(target)
-  }, [playOpen, playClose, animateColor, onMenuOpen, onMenuClose])
 
   const closeMenu = useCallback(() => {
     if (openRef.current) {
@@ -300,9 +284,21 @@ export function StaggeredMenu({
       setOpen(false)
       onMenuClose?.()
       playClose()
-      animateColor(false)
     }
-  }, [playClose, animateColor, onMenuClose])
+  }, [playClose, onMenuClose])
+
+  const toggleMenu = useCallback(() => {
+    if (busyRef.current) return
+    const willOpen = !openRef.current
+    if (willOpen) {
+      setOpen(true)
+      openRef.current = true
+      onMenuOpen?.()
+      playOpen()
+    } else {
+      closeMenu()
+    }
+  }, [playOpen, closeMenu, onMenuOpen])
 
   useEffect(() => {
     if (!closeOnClickAway || !open) return
@@ -324,17 +320,33 @@ export function StaggeredMenu({
     }
   }, [closeOnClickAway, open, closeMenu])
 
+  // Close menu when path changes
+  useEffect(() => {
+    if (open) {
+      closeMenu()
+    }
+  }, [currentPath, closeMenu])
+
   return (
     <div
-      className={(className ? className + ' ' : '') + 'staggered-menu-wrapper' + (isFixed ? ' fixed-wrapper' : '')}
-      style={accentColor ? { ['--sm-accent' as any]: accentColor } : undefined}
+      className={cn("staggered-menu-wrapper", isFixed && "fixed-wrapper", className)}
+      style={{
+        ...(accentColor ? { '--sm-accent': accentColor } : {}),
+        ...(changeMenuColorOnOpen ? {
+          '--sm-btn-color': menuButtonColor,
+          '--sm-btn-open-color': openMenuButtonColor
+        } : {
+          '--sm-btn-color': menuButtonColor,
+          '--sm-btn-open-color': menuButtonColor
+        })
+      } as React.CSSProperties}
       data-position={position}
       data-open={open || undefined}
     >
       <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
         {(() => {
           const raw = colors && colors.length ? colors.slice(0, 4) : ['#1e1e22', '#35353c']
-          let arr = [...raw]
+          const arr = [...raw]
           if (arr.length >= 3) {
             const mid = Math.floor(arr.length / 2)
             arr.splice(mid, 1)
@@ -343,33 +355,24 @@ export function StaggeredMenu({
         })()}
       </div>
       <header className="staggered-menu-header" aria-label="Main navigation header">
-        <div className="sm-logo" aria-label="Logo">
-          {logoUrl && (
-            <img
-              src={logoUrl}
-              alt="Logo"
-              className="sm-logo-img"
-              draggable={false}
-              width={110}
-              height={24}
-            />
-          )}
+        {headerLeft && <div className="sm-header-left">{headerLeft}</div>}
+        
+        <div className="flex items-center gap-2 sm-header-right ml-auto">
+          {headerRight}
+          <button
+            ref={toggleBtnRef}
+            className="sm-toggle relative z-[100] flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            aria-controls="staggered-menu-panel"
+            onClick={toggleMenu}
+            type="button"
+          >
+            <span className={`w-6 h-[2px] bg-current rounded-full transition-all duration-300 ease-in-out ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
+            <span className={`w-6 h-[2px] bg-current rounded-full transition-all duration-300 ease-in-out ${open ? 'opacity-0 translate-x-2' : ''}`} />
+            <span className={`w-6 h-[2px] bg-current rounded-full transition-all duration-300 ease-in-out ${open ? '-translate-y-[7px] -rotate-45' : ''}`} />
+          </button>
         </div>
-        <button
-          ref={toggleBtnRef}
-          className="sm-toggle"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          aria-controls="staggered-menu-panel"
-          onClick={toggleMenu}
-          type="button"
-        >
-          <span className="sm-hamburger">
-            <span className="sm-hamburger-line sm-line-1" />
-            <span className="sm-hamburger-line sm-line-2" />
-            <span className="sm-hamburger-line sm-line-3" />
-          </span>
-        </button>
       </header>
 
       <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
@@ -378,15 +381,19 @@ export function StaggeredMenu({
             {items && items.length ? (
               items.map((it, idx) => (
                 <li className="sm-panel-itemWrap" key={it.label + idx}>
-                  <Link 
-                    className="sm-panel-item" 
+                  <a 
+                    className={cn(
+                      "sm-panel-item", 
+                      currentPath === it.link && "text-primary"
+                    )} 
                     href={it.link} 
                     aria-label={it.ariaLabel} 
                     data-index={idx + 1}
                     onClick={closeMenu}
                   >
+                    {it.icon && <span className="mr-3 opacity-70">{it.icon}</span>}
                     <span className="sm-panel-itemLabel">{it.label}</span>
-                  </Link>
+                  </a>
                 </li>
               ))
             ) : (
@@ -411,6 +418,18 @@ export function StaggeredMenu({
               </ul>
             </div>
           )}
+
+          <div className="sm-github-section mt-auto pt-4">
+            <a 
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm-github-link flex items-center gap-2 text-sm font-medium opacity-60 hover:opacity-100 transition-all duration-300 hover:text-primary group"
+            >
+              {Github && <Github size={16} className="group-hover:scale-110 transition-transform" />}
+              <span>FlowLedger Repository</span>
+            </a>
+          </div>
         </div>
       </aside>
     </div>
