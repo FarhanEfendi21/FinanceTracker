@@ -137,11 +137,11 @@ export default function TransactionsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <Button 
               variant="outline" 
               onClick={handleExportCSV}
-              className="h-11 rounded-2xl border-black/5 dark:border-white/5 bg-white dark:bg-card font-bold hover:bg-black/5 dark:hover:bg-white/5"
+              className="h-11 w-full sm:w-auto rounded-2xl border-black/5 dark:border-white/5 bg-white dark:bg-card font-bold hover:bg-black/5 dark:hover:bg-white/5"
             >
               <Download className="mr-2 h-4 w-4" />
               Export CSV
@@ -149,7 +149,7 @@ export default function TransactionsPage() {
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="h-11 rounded-2xl bg-black dark:bg-white font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                <Button className="h-11 w-full sm:w-auto rounded-2xl bg-black dark:bg-white font-bold text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/5 transition-all hover:scale-[1.02] active:scale-[0.98]">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Transaction
                 </Button>
