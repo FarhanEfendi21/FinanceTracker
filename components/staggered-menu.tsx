@@ -97,6 +97,7 @@ export const StaggeredMenu = ({
     return () => ctx.revert()
   }, [position])
 
+  // Build and configure the GSAP staggered entrance animation timeline for the layers and menu items
   const buildOpenTimeline = useCallback(() => {
     const panel = panelRef.current
     const layers = preLayerElsRef.current
