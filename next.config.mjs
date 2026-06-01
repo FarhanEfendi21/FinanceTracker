@@ -1,11 +1,8 @@
-import withPWAInit from 'next-pwa'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const withPWA = withPWAInit({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-})
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,7 +12,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  turbopack: {},
+  experimental: {
+    optimizePackageImports: ['recharts', 'framer-motion', 'lucide-react', 'date-fns'],
+  },
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
 }
 
-export default withPWA(nextConfig)
+export default nextConfig
