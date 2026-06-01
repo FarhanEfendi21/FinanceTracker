@@ -6,28 +6,28 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#0B0F19",
+  "theme_color": "#2563EB",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000000' width='192' height='192'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='%23ffffff' text-anchor='middle' dy='.3em'>FL</text></svg>",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23000000' width='192' height='192'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='%23ffffff' text-anchor='middle' dy='.3em'>FL</text></svg>",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
   "categories": ["finance", "productivity"],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23f5f5f5' width='540' height='720'/><text x='270' y='360' font-size='48' font-weight='bold' fill='%23000000' text-anchor='middle' dy='.3em'>FlowLedger</text></svg>",
+      "src": "/placeholder.jpg",
       "sizes": "540x720",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "form_factor": "narrow"
     }
   ]
